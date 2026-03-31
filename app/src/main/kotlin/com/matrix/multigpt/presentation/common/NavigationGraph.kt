@@ -15,6 +15,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.matrix.multigpt.data.model.ApiType
+import com.matrix.multigpt.presentation.ui.autoreply.AutoReplySettingsScreen
 import com.matrix.multigpt.presentation.ui.chat.ChatScreen
 import com.matrix.multigpt.presentation.ui.home.HomeScreen
 import com.matrix.multigpt.presentation.ui.localai.LocalAIEntryScreen
@@ -57,7 +58,7 @@ fun NavGraphBuilder.startScreenNavigation(navController: NavHostController) {
             onSkipClick = { navController.navigate(Route.FEATURE_TOUR) }
         )
     }
-    
+
     composable(Route.FEATURE_TOUR) {
         FeatureTourScreen(
             onSetupNow = { navController.navigate(Route.SETUP_ROUTE) },
@@ -66,9 +67,7 @@ fun NavGraphBuilder.startScreenNavigation(navController: NavHostController) {
     }
 }
 
-fun NavGraphBuilder.setupNavigation(
-    navController: NavHostController
-) {
+fun NavGraphBuilder.setupNavigation(navController: NavHostController) {
     navigation(startDestination = Route.SELECT_PLATFORM, route = Route.SETUP_ROUTE) {
         composable(route = Route.SELECT_PLATFORM) {
             val parentEntry = remember(it) {
@@ -187,11 +186,9 @@ fun NavGraphBuilder.setupNavigation(
                 navController.getBackStackEntry(Route.SETUP_ROUTE)
             }
             val setupViewModel: SetupViewModel = hiltViewModel(parentEntry)
-            // Use LocalAIEntryScreen to ensure feature is installed first
             LocalAIEntryScreen(
                 onNavigateBack = { navController.navigateUp() },
                 onFeatureReady = {
-                    // Feature installed, navigate to models screen in setup flow
                     navController.navigate(Route.SETUP_LOCAL_AI_MODELS) {
                         popUpTo(Route.LOCAL_MODEL_SELECT) { inclusive = true }
                     }
@@ -203,11 +200,9 @@ fun NavGraphBuilder.setupNavigation(
                 navController.getBackStackEntry(Route.SETUP_ROUTE)
             }
             val setupViewModel: SetupViewModel = hiltViewModel(parentEntry)
-            // Local AI Models screen within setup flow
             LocalAIModelsScreen(
                 onNavigateBack = { navController.navigateUp() },
                 onNavigateToChat = { modelId: String, modelPath: String ->
-                    // Model downloaded - continue setup flow
                     val nextStep = setupViewModel.getNextSetupRoute(Route.LOCAL_MODEL_SELECT)
                     navController.navigate(nextStep)
                 }
@@ -291,7 +286,8 @@ fun NavGraphBuilder.settingNavigation(navController: NavHostController) {
                     }
                 },
                 onNavigateToAboutPage = { navController.navigate(Route.ABOUT_PAGE) },
-                onNavigateToLocalAI = { navController.navigate(Route.LOCAL_AI_ENTRY) }
+                onNavigateToLocalAI = { navController.navigate(Route.LOCAL_AI_ENTRY) },
+                onNavigateToAutoReply = { navController.navigate(Route.AUTO_REPLY_SETTINGS) }
             )
         }
         composable(Route.OPENAI_SETTINGS) {
@@ -374,12 +370,9 @@ fun NavGraphBuilder.settingNavigation(navController: NavHostController) {
             )
         }
         composable(Route.LOCAL_AI_MODELS) {
-            // Loads from the dynamic feature module via reflection
             LocalAIModelsScreen(
                 onNavigateBack = { navController.navigateUp() },
                 onNavigateToChat = { modelId: String, modelPath: String ->
-                    // Model selected - navigate back to settings
-                    // User will create new chat from home screen with LOCAL platform enabled
                     navController.navigateUp()
                 },
                 onNavigateToSettings = {
@@ -397,7 +390,12 @@ fun NavGraphBuilder.settingNavigation(navController: NavHostController) {
                 apiType = ApiType.LOCAL
             ) { navController.navigateUp() }
         }
+
+        // Auto Reply Settings
+        composable(Route.AUTO_REPLY_SETTINGS) {
+            AutoReplySettingsScreen(
+                onBack = { navController.navigateUp() }
+            )
+        }
     }
 }
-
-// Removed unused placeholder functions - using direct import now
