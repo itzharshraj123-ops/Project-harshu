@@ -1,4 +1,4 @@
-Package com.matrix.multigpt.presentation.ui.chat
+package com.matrix.multigpt.presentation.ui.chat
 
 import android.content.Context
 import android.util.Log
