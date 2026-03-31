@@ -52,7 +52,8 @@ fun SettingScreen(
     onNavigationClick: () -> Unit,
     onNavigateToPlatformSetting: (ApiType) -> Unit,
     onNavigateToAboutPage: () -> Unit,
-    onNavigateToLocalAI: () -> Unit = {}
+    onNavigateToLocalAI: () -> Unit = {},
+    onNavigateToAutoReply: () -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
     val scrollBehavior = pinnedExitUntilCollapsedScrollBehavior(
@@ -76,11 +77,14 @@ fun SettingScreen(
                 .verticalScroll(scrollState)
         ) {
             ThemeSetting { settingViewModel.openThemeDialog() }
-            
-            // Local AI Models - On-device inference (top priority, right after theme)
+
+            // Local AI Models
             LocalAISettingItem(onItemClick = onNavigateToLocalAI)
-            
-            // Cloud-based API platforms (exclude LOCAL since it has dedicated settings)
+
+            // Auto Reply
+            AutoReplySettingItem(onItemClick = onNavigateToAutoReply)
+
+            // Cloud-based API platforms
             ApiType.entries.filter { it != ApiType.LOCAL }.forEach { apiType ->
                 SettingItem(
                     title = getPlatformSettingTitle(apiType),
@@ -90,7 +94,7 @@ fun SettingScreen(
                     showLeadingIcon = false
                 )
             }
-            
+
             AboutPageItem(onItemClick = onNavigateToAboutPage)
 
             if (dialogState.isThemeDialogOpen) {
@@ -124,7 +128,10 @@ private fun SettingTopBar(
                 modifier = Modifier.padding(4.dp),
                 onClick = navigationOnClick
             ) {
-                Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.go_back))
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.go_back)
+                )
             }
         },
         scrollBehavior = scrollBehavior
@@ -132,9 +139,7 @@ private fun SettingTopBar(
 }
 
 @Composable
-fun ThemeSetting(
-    onItemClick: () -> Unit
-) {
+fun ThemeSetting(onItemClick: () -> Unit) {
     SettingItem(
         title = stringResource(R.string.theme_settings),
         description = stringResource(R.string.theme_description),
@@ -145,9 +150,7 @@ fun ThemeSetting(
 }
 
 @Composable
-fun LocalAISettingItem(
-    onItemClick: () -> Unit
-) {
+fun LocalAISettingItem(onItemClick: () -> Unit) {
     SettingItem(
         title = stringResource(R.string.local_ai_models),
         description = stringResource(R.string.local_ai_description),
@@ -158,9 +161,18 @@ fun LocalAISettingItem(
 }
 
 @Composable
-fun AboutPageItem(
-    onItemClick: () -> Unit
-) {
+fun AutoReplySettingItem(onItemClick: () -> Unit) {
+    SettingItem(
+        title = "Auto Reply",
+        description = "WhatsApp, Telegram, Instagram ko AI se auto reply karo",
+        onItemClick = onItemClick,
+        showTrailingIcon = true,
+        showLeadingIcon = false
+    )
+}
+
+@Composable
+fun AboutPageItem(onItemClick: () -> Unit) {
     SettingItem(
         title = stringResource(R.string.about),
         description = stringResource(R.string.about_description),
@@ -171,21 +183,16 @@ fun AboutPageItem(
 }
 
 @Composable
-fun ThemeSettingDialog(
-    settingViewModel: SettingViewModel = hiltViewModel()
-) {
+fun ThemeSettingDialog(settingViewModel: SettingViewModel = hiltViewModel()) {
     val themeViewModel = LocalThemeViewModel.current
     AlertDialog(
         text = {
-            Column(
-                modifier = Modifier.verticalScroll(rememberScrollState())
-            ) {
-                Text(text = stringResource(R.string.dynamic_theme), style = MaterialTheme.typography.titleMedium)
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(16.dp)
+            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                Text(
+                    text = stringResource(R.string.dynamic_theme),
+                    style = MaterialTheme.typography.titleMedium
                 )
+                Spacer(modifier = Modifier.fillMaxWidth().height(16.dp))
                 DynamicTheme.entries.forEach { theme ->
                     RadioItem(
                         title = getDynamicThemeTitle(theme),
@@ -196,17 +203,12 @@ fun ThemeSettingDialog(
                         themeViewModel.updateDynamicTheme(theme)
                     }
                 }
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(24.dp)
+                Spacer(modifier = Modifier.fillMaxWidth().height(24.dp))
+                Text(
+                    text = stringResource(R.string.dark_mode),
+                    style = MaterialTheme.typography.titleMedium
                 )
-                Text(text = stringResource(R.string.dark_mode), style = MaterialTheme.typography.titleMedium)
-                Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(16.dp)
-                )
+                Spacer(modifier = Modifier.fillMaxWidth().height(16.dp))
                 ThemeMode.entries.forEach { theme ->
                     RadioItem(
                         title = getThemeModeTitle(theme),
@@ -221,9 +223,7 @@ fun ThemeSettingDialog(
         },
         onDismissRequest = settingViewModel::closeThemeDialog,
         confirmButton = {
-            TextButton(
-                onClick = settingViewModel::closeThemeDialog
-            ) {
+            TextButton(onClick = settingViewModel::closeThemeDialog) {
                 Text(stringResource(R.string.confirm))
             }
         }
