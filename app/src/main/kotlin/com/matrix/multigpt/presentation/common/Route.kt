@@ -32,10 +32,13 @@ object Route {
     const val LOCAL_SETTINGS = "local_settings"
     const val ABOUT_PAGE = "about"
     const val LICENSE = "license"
-    
+
     // Local AI
     const val LOCAL_AI_ENTRY = "local_ai_entry"
     const val LOCAL_AI_MODELS = "local_ai_models"
     const val LOCAL_AI_SETTINGS = "local_ai_settings"
-    const val SETUP_LOCAL_AI_MODELS = "setup_local_ai_models"  // Used in setup flow
+    const val SETUP_LOCAL_AI_MODELS = "setup_local_ai_models"
+
+    // Auto Reply
+    const val AUTO_REPLY_SETTINGS = "auto_reply_settings"
 }
