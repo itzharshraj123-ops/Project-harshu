@@ -96,9 +96,7 @@ class AutoReplyManager @Inject constructor(
 
         return try {
             val platforms = settingRepository.fetchPlatforms()
-            val activePlatform = platforms.firstOrNull { platform ->
-                settingRepository.getPlatformStatus(platform.name) == true
-            } ?: return ""
+            val activePlatform = platforms.firstOrNull { it.enabled } ?: return ""
 
             val replyFlow = when (activePlatform.name) {
                 ApiType.OPENAI -> chatRepository.completeOpenAIChat(questionMessage, history)
