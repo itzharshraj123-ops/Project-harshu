@@ -110,7 +110,7 @@ class AutoReplyManager @Inject constructor(
 
             val sb = StringBuilder()
             replyFlow.collect { state ->
-                if (state is ApiState.Success) sb.append(state.data)
+                if (state is ApiState.Success) sb.append(state.textChunk)
             }
             sb.toString().trim()
 
