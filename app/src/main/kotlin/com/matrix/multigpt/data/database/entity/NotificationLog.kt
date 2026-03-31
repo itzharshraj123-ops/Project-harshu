@@ -8,9 +8,10 @@ data class NotificationLog(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val senderName: String,
-    val originalMessage: String,
-    val aiReply: String,
+    val senderKey: String, // phone number ya unique identifier
     val appPackage: String,
-    val status: String, // "success", "failed", "received"
+    val originalMessage: String,
+    val aiReply: String = "",
+    val status: String, // "received", "success", "failed"
     val createdAt: Long = System.currentTimeMillis()
 )
