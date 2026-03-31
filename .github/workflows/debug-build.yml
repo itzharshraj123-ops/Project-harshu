@@ -1,6 +1,7 @@
 name: Debug build APK
 
 on:
+  workflow_dispatch:
   pull_request_target:
     branches:
       - "main"
@@ -24,8 +25,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.ref }}
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref || github.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
 
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -88,6 +89,7 @@ jobs:
           path: ${{ github.workspace }}/app/build/outputs/apk/debug/app-debug.apk
 
       - name: Comment APK Link
+        if: github.event_name == 'pull_request_target'
         uses: thollander/actions-comment-pull-request@v2
         with:
           comment_tag: apk
